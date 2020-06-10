@@ -42,18 +42,16 @@ MODULES_ALL = #
 # rules
 
 define MODULE_MK_PROCESS
-$(warning ************************************MODULE_MK_PROCESS*******************************************)
-$(warning $(1))
+
 include $(1)
-$(warning ************************************MODULE_MK_PROCESS*******************************************)
+
 endef
 
 define MODULE_OBJS_PROCESS
-$(warning ************************************MODULE_OBJS_PROCESS*******************************************)
-$(warning $(1) /$(1)_objs / $($(1)_objs))
-$(1)_objs += $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o
-$(warning $($(1)_objs))
-$(warning ************************************MODULE_OBJS_PROCESS*******************************************)
+
+OBJS_$(1) += $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o
+DEPS += $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).d
+
 endef
 
 define MODULE_PROCESS
@@ -78,46 +76,67 @@ LIBS		:= $(addprefix -l, $(MODULES))
 
 # rules
 
-define MODULE_OBJ_CRULE
-$(warning ************************************MODULE_OBJ_CRULE*******************************************)
+define MODULE_OBJ_RULE.c
 
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
-	@echo MODULE_OBJ_CRULE $$@  ....... $$^
-	mkdir -p $(OUTPUT)/objs_$(1)
-	gcc -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
-	
-$(warning ************************************MODULE_OBJ_CRULE*******************************************)
+	@echo '<$(1)>': CC $(basename $(notdir $(2))).o
+	@mkdir -p $(OUTPUT)/objs_$(1)
+	@gcc -MD -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+endef
+
+define MODULE_OBJ_RULE.cpp
+
+$(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
+	@echo '<$(1)>': CPP $(basename $(notdir $(2))).o
+	@mkdir -p $(OUTPUT)/objs_$(1)
+	@gcc -MD -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+endef
+
+define MODULE_OBJ_RULE.s
+
+$(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
+	@echo '<$(1)>': AS $(basename $(notdir $(2))).o
+	@mkdir -p $(OUTPUT)/objs_$(1)
+	@gcc -MD -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_RULE
-$(warning ************************************MODULE_RULE*******************************************)
 
-$(foreach module_obj, $(SRCS_$(1)), $(call MODULE_OBJ_CRULE,$(1),$(module_obj)))
+$(foreach module_obj, $(SRCS_$(1)), $(call MODULE_OBJ_RULE$(suffix $(module_obj)),$(1),$(module_obj)))
 
 ifeq ($(1), main)
-main: $($(1)_objs)
-	@echo main $$@  ....... $$^ ..... $(LIBS)
-	gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS) 
+main: $(OBJS_$(1))
+	@echo '<main>': LINK
+	@gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS) 
 else
-$(1): $($(1)_objs)
-	@echo MODULE_RULE $$@  ....... $$^
-	ar -r $(OUTPUT)/lib$$@.a $$^
+$(1): $(OBJS_$(1))
+	@echo '<lib$$@.a>': PACK
+	@ar -r $(OUTPUT)/lib$$@.a $$^
 endif
-
-$(warning ************************************MODULE_RULE*******************************************)
 endef 
 
 # apply rules for all module to generate library
 
 $(foreach module, $(MODULES_ALL),$(eval $(call MODULE_RULE,$(module))))
 
+# include depends files
+
+ifneq ($(strip $(DEPS)),)
+DEPS_EXISTED = $(foreach dep, $(DEPS), $(wildcard $(obj)))
+
+ifneq ($(strip $(DEPS_EXISTED)),)
+include $(DEPS_EXISTED)
+endif
+
+endif
+
 # build command 
 
 all: $(MODULES) main
-	@echo $@ $^
+	@echo Generated $(OUTPUT)/main
 
 clean: 
-	rm -rf $(OUTPUT)/*
+	@rm -rf $(OUTPUT)/*
 
 help:
 	@echo 'Build:'
