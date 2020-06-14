@@ -32,6 +32,24 @@ OUT			:= $(subst \,/,$(OUT))
 OUTPUT    	:= $(OUT)
 endif
 
+ifeq ("$(origin V)", "command line")
+  VREBOSE_BUILD = $(V)
+endif
+
+ifndef VREBOSE_BUILD
+  VREBOSE_BUILD = 0
+endif
+
+ifeq ($(VREBOSE_BUILD),1)
+  QUIET =
+  Q =
+  VERBOSE = v
+else
+  QUIET=quiet
+  Q = @
+  VERBOSE =
+endif
+
 default: all
 
 # process modules
@@ -60,12 +78,12 @@ endef
 
 # apply rules for all module to prepare objects
 
-$(foreach module_mk, $(MODULE_MKS),$(eval $(call MODULE_MK_PROCESS,$(module_mk))))
+$(foreach module_mk, $(MODULE_MKS), $(eval $(call MODULE_MK_PROCESS,$(module_mk))))
 
 # re-sort modules and remove repeated modules
 
 MODULES_ALL := $(sort $(MODULES_ALL))
-$(foreach module, $(MODULES_ALL),$(eval $(call MODULE_PROCESS,$(module))))
+$(foreach module, $(MODULES_ALL), $(eval $(call MODULE_PROCESS,$(module))))
 
 # filter out main module and prepare libraies
 
@@ -79,25 +97,25 @@ LIBS		:= $(addprefix -l, $(MODULES))
 define MODULE_OBJ_RULE.c
 
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
-	@echo '<$(1)>': CC $(basename $(notdir $(2))).o
-	@mkdir -p $(OUTPUT)/objs_$(1)
-	@gcc -MD -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)$(if $(QUIET), echo '<$(1)>': CC $(basename $(notdir $(2))).o)
+	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
+	$(Q)gcc -MD -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.cpp
 
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
-	@echo '<$(1)>': CPP $(basename $(notdir $(2))).o
-	@mkdir -p $(OUTPUT)/objs_$(1)
-	@gcc -MD -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)$(if $(QUIET), echo '<$(1)>': CPP $(basename $(notdir $(2))).o)
+	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
+	$(Q)gcc -MD -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.s
 
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
-	@echo '<$(1)>': AS $(basename $(notdir $(2))).o
-	@mkdir -p $(OUTPUT)/objs_$(1)
-	@gcc -MD -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)$(if $(QUIET), echo '<$(1)>': AS $(basename $(notdir $(2))).o)
+	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
+	$(Q)gcc -MD -c $$< -o $$@ $(ASMFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_RULE
@@ -106,18 +124,18 @@ $(foreach module_obj, $(SRCS_$(1)), $(call MODULE_OBJ_RULE$(suffix $(module_obj)
 
 ifeq ($(1), main)
 main: $(OBJS_$(1))
-	@echo '<main>': LINK
-	@gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS) 
+	$(Q)$(if $(QUIET), echo '<main>': LK main)
+	$(Q)gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS) 
 else
 $(1): $(OBJS_$(1))
-	@echo '<lib$$@.a>': PACK
-	@ar -r $(OUTPUT)/lib$$@.a $$^
+	$(Q)$(if $(QUIET), echo '<$$@>': AR lib$$@.a)
+	$(Q)ar crs $(OUTPUT)/lib$$@.a $$^
 endif
 endef 
 
 # apply rules for all module to generate library
 
-$(foreach module, $(MODULES_ALL),$(eval $(call MODULE_RULE,$(module))))
+$(foreach module, $(MODULES_ALL), $(eval $(call MODULE_RULE,$(module))))
 
 # include depends files
 
