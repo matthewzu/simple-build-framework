@@ -1,9 +1,19 @@
 mainmenu "simple build framework"
 
+source "main/main.config"
+
 config MODULE1
-    string "Enable Module 1"
+    bool    "Enable Module 1"
     default n
 
+if MODULE1
+source "mod1/mod1.config"
+endif
+
 config MODULE2
-    string "Enable Module 2"
+    bool    "Enable Module 2"
     default n
+
+if MODULE2
+source "mod2/mod2.config"
+endif
