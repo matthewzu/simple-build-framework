@@ -1,0 +1,9 @@
+mainmenu "simple build framework"
+
+config MODULE1
+    string "Enable Module 1"
+    default n
+
+config MODULE2
+    string "Enable Module 2"
+    default n

@@ -17,7 +17,7 @@
 # check build options and command an prepare 
 
 ifneq ($(MAKECMDGOALS),)
-	ifeq ($(filter $(MAKECMDGOALS), all clean help),)
+	ifeq ($(filter $(MAKECMDGOALS), config all clean help),)
 		$(error Unsupported commands, try "make help" for more details)	
 	endif
 endif
@@ -25,12 +25,22 @@ endif
 SRC_TREE 	:= $(shell pwd)
 
 ifeq ($(OUT), )
-OUTPUT    	:= $(SRC_TREE)/output
+OUTPUT    		:= $(SRC_TREE)/output
 $(warning default output directory ($(OUTPUT)) is used!)
 else
-OUT			:= $(subst \,/,$(OUT))
-OUTPUT    	:= $(OUT)
+OUT				:= $(subst \,/,$(OUT))
+OUTPUT    		:= $(OUT)
 endif
+
+ifeq ($(KCONFIG), )
+KCONFIG_PATH 	:= $(SRC_TREE)/../Kconfiglib
+$(warning default Kconfiglib directory ($(KCONFIG_PATH)) is used!)
+else
+KCONFIG			:= $(subst \,/,$(KCONFIG))
+KCONFIG_PATH    := $(KCONFIG)
+endif
+
+export KCONFIG_CONFIG=$(OUTPUT)/config/config.mk
 
 ifeq ("$(origin V)", "command line")
   VREBOSE_BUILD = $(V)
@@ -54,6 +64,7 @@ default: all
 
 # process modules
 
+MODULE_CFGS = Kconfig $(shell find $(SRC_TREE) -name *.config)
 MODULE_MKS	= $(shell find $(SRC_TREE) -name module.mk)
 MODULES_ALL = #
 
@@ -129,7 +140,7 @@ main: $(OBJS_$(1))
 else
 $(1): $(OBJS_$(1))
 	$(Q)$(if $(QUIET), echo '<$$@>': AR lib$$@.a)
-	$(Q)ar crs $(OUTPUT)/lib$$@.a $$^
+	$(Q)ar crs$(VERBOSE) $(OUTPUT)/lib$$@.a $$^
 endif
 endef 
 
@@ -150,6 +161,11 @@ endif
 
 # build command 
 
+config: $(MODULE_CFGS)
+	$(Q)mkdir -p $(OUTPUT)/config
+	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
+	$(Q)python3 $(KCONFIG_PATH)/menuconfig.py
+
 all: $(MODULES) main
 	@echo Generated $(OUTPUT)/main
 
@@ -164,6 +180,7 @@ help:
 	@echo '    make [OUT=<path for output>] [command]'
 	@echo '----------------------------------------------------------------------------------------'
 	@echo 'command:'
+	@echo '    config- configure all modules and generate header and mk'
 	@echo '    all   - build all modules and generate finally output'
 	@echo '    clean - clean all generated files'
 	@echo '    help  - help message'
