@@ -32,4 +32,4 @@ you could use type **make help** to obtain the usage for all make commands.
 ## TODO
 
 1. support for header files;
-2. more configuration options(compiler, name of executable file, level of debug information, and so on).
+2. more configuration options(compiler, name of executable file, and so on).

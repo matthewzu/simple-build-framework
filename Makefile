@@ -188,7 +188,7 @@ help:
 	@echo '    make [options] [command]'
 	@echo '----------------------------------------------------------------------------------------'
 	@echo 'SYNOPSIS:'
-	@echo '    make [OUT=<path for output>] KCONFIG=<path for Kconfiglib> [command]'
+	@echo '    make [OUT=<path for output>] KCONFIG=<path for Kconfiglib> V=0|1 [command]'
 	@echo '----------------------------------------------------------------------------------------'
 	@echo 'command:'
 	@echo '    config- configure all modules and generate header and mk'
@@ -202,5 +202,6 @@ help:
 	@echo '    OUT   	- path for output directory, will be "$(SRC_TREE)/output" if absent.'
 	@echo '    KCONFIG 	- path for Kconfiglib directory, will be "$(SRC_TREE)/../Kconfiglib" if absent,'
 	@echo '                  could be obtained by "git clone https://github.com/ulfalizer/Kconfiglib.git"'
+	@echo '    V   		- verbos level for debug level, 0 - no debug information 1 - display debug information'
 	@echo ''
 
