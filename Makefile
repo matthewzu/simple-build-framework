@@ -24,6 +24,8 @@ endif
 
 SRC_TREE 	:= $(shell pwd)
 
+ifneq ($(MAKECMDGOALS), help)
+
 ifeq ($(OUT), )
 OUTPUT    		:= $(SRC_TREE)/output
 $(warning default output directory ($(OUTPUT)) is used!)
@@ -32,6 +34,10 @@ OUT				:= $(subst \,/,$(OUT))
 OUTPUT    		:= $(OUT)
 endif
 
+endif # MAKECMDGOALS != help
+
+ifeq ($(MAKECMDGOALS), config)
+
 ifeq ($(KCONFIG), )
 KCONFIG_PATH 	:= $(SRC_TREE)/../Kconfiglib
 $(warning default Kconfiglib directory ($(KCONFIG_PATH)) is used!)
@@ -39,6 +45,12 @@ else
 KCONFIG			:= $(subst \,/,$(KCONFIG))
 KCONFIG_PATH    := $(KCONFIG)
 endif
+
+ifeq ($(wildcard $(KCONFIG_PATH)/genconfig.py),)
+$(error '$(KCONFIG_PATH)' is invalid path for Kconfiglib, obtain it refer to README.md)
+endif
+
+endif # MAKECMDGOALS == config
 
 export KCONFIG_CONFIG=$(OUTPUT)/config/config.mk
 
@@ -176,7 +188,7 @@ help:
 	@echo '    make [options] [command]'
 	@echo '----------------------------------------------------------------------------------------'
 	@echo 'SYNOPSIS:'
-	@echo '    make [OUT=<path for output>] [command]'
+	@echo '    make [OUT=<path for output>] KCONFIG=<path for Kconfiglib> [command]'
 	@echo '----------------------------------------------------------------------------------------'
 	@echo 'command:'
 	@echo '    config- configure all modules and generate header and mk'
@@ -187,6 +199,8 @@ help:
 	@echo 'Note that "all" will be used if [target] is absent.'
 	@echo '----------------------------------------------------------------------------------------'
 	@echo 'options:'
-	@echo '    OUT   - path for output directory, will be "$(SRC_TREE)/output" if absent.'
+	@echo '    OUT   	- path for output directory, will be "$(SRC_TREE)/output" if absent.'
+	@echo '    KCONFIG 	- path for Kconfiglib directory, will be "$(SRC_TREE)/../Kconfiglib" if absent,'
+	@echo '                  could be obtained by "git clone https://github.com/ulfalizer/Kconfiglib.git"'
 	@echo ''
 
