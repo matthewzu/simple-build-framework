@@ -14,9 +14,12 @@
 
 # Module makefile
 
-MODULES_$(CONFIG_MODULE11) += mod1
+MODULES_$(CONFIG_MODULE11) += mod11
 
-SRC_TREE_MODE11					= $(SRC_TREE)/mod1/mod11
-SRCS_mod1_$(CONFIG_MODULE11)	+= $(SRC_TREE_MODE11)/mod11.c
-CFLAGS_mod1 					= -DCFALSG_mod1
-CFLAGS_mod1_mod11 				= -DCFLAGS_mod1_mod11
+SRC_TREE_MOD11					= $(SRC_TREE)/mod1/mod11
+SRCS_mod11_$(CONFIG_MODULE11)	= $(SRC_TREE_MOD11)/source/mod11.c
+HDRDIR_mod11_$(CONFIG_MODULE11)	= $(SRC_TREE_MOD11)/include
+HDRS_mod11_$(CONFIG_MODULE11)	= $(SRC_TREE_MOD11)/include/mod11/mod11.h
+
+CFLAGS_mod1 					= -DCFALSG_MOD1
+CFLAGS_mod1_mod11 				= -DCFLAGS_MOD1_MOD11

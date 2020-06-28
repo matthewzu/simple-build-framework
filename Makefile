@@ -120,12 +120,25 @@ LIBS		:= $(addprefix -l, $(MODULES))
 
 # rules
 
+define MODULE_HDR_RULE
+$(warning $(1) MODULE_HDR_RULE $(2))
+
+.PHONY: $(2)
+
+$(2):
+	$(warning $(1) 11111111 $(2))
+	$(Q)mkdir -p$(VERBOSE) $(dir $(patsubst $(1)/%, $(OUTPUT)/include/%,$(2)))
+	$(Q)cp -fu$(VERBOSE) $(2) $(patsubst $(1)/%, $(OUTPUT)/include/%,$(2))
+
+endef
+
 define MODULE_OBJ_RULE.c
 
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
+	$(warning $(1) MODULE_OBJ_RULE=$(HDRS_$(1)_y))
 	$(Q)$(if $(QUIET), echo '<$(1)>': CC $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD -I$(OUTPUT)/config -I$(OUTPUT)/include -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.cpp
@@ -146,14 +159,20 @@ endef
 
 define MODULE_RULE
 
+$(warning $(1) MODULE_RULE1=$(HDRS_$(1)_y))
+
+$(foreach module_hdr, $(HDRS_$(1)_y), $(call MODULE_HDR_RULE,$(HDRDIR_$(1)_y),$(module_hdr)))
+
 $(foreach module_obj, $(SRCS_$(1)_y), $(call MODULE_OBJ_RULE$(suffix $(module_obj)),$(1),$(module_obj)))
+
+$(warning $(1) MODULE_RULE2=$(HDRS_$(1)_y))
 
 ifeq ($(1), main)
 main: $(OBJS_$(1))
 	$(Q)$(if $(QUIET), echo '<main>': LK main)
 	$(Q)gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS) 
 else
-$(1): $(OBJS_$(1))
+$(1): $(HDRS_$(1)_y) $(OBJS_$(1))
 	$(Q)$(if $(QUIET), echo '<$$@>': AR lib$$@.a)
 	$(Q)ar crs$(VERBOSE) $(OUTPUT)/lib$$@.a $$^
 endif

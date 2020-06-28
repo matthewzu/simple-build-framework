@@ -14,7 +14,7 @@
 
 # Module makefile
 
-MODULES_$(CONFIG_MODULE12) += mod1
+MODULES_$(CONFIG_MODULE12) += mod12
 
-SRCS_mod1_$(CONFIG_MODULE12)	+= $(SRC_TREE)/mod1/mod12/mod12.c
-CFLAGS_mod1_mod12 				= -DCFLAGS_mod1_mod12
+SRCS_mod12_$(CONFIG_MODULE12)	= $(SRC_TREE)/mod1/mod12/mod12.c
+CFLAGS_mod1_mod12 				= -DCFLAGS_MOD1_MOD12
