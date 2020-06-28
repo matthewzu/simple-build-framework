@@ -62,11 +62,14 @@ endif
 
 default: all
 
+# include config.mk
+
+-include $(KCONFIG_CONFIG)
+
 # process modules
 
-MODULE_CFGS = Kconfig $(shell find $(SRC_TREE) -name *.config)
 MODULE_MKS	= $(shell find $(SRC_TREE) -name module.mk)
-MODULES_ALL = #
+MODULES_y = #
 
 # rules
 
@@ -84,7 +87,7 @@ DEPS += $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).d
 endef
 
 define MODULE_PROCESS
-$(foreach module_obj, $(SRCS_$(1)), $(call MODULE_OBJS_PROCESS,$(1),$(module_obj)))
+$(foreach module_obj, $(SRCS_$(1)_y), $(call MODULE_OBJS_PROCESS,$(1),$(module_obj)))
 endef
 
 # apply rules for all module to prepare objects
@@ -93,12 +96,12 @@ $(foreach module_mk, $(MODULE_MKS), $(eval $(call MODULE_MK_PROCESS,$(module_mk)
 
 # re-sort modules and remove repeated modules
 
-MODULES_ALL := $(sort $(MODULES_ALL))
-$(foreach module, $(MODULES_ALL), $(eval $(call MODULE_PROCESS,$(module))))
+MODULES_y := $(sort $(MODULES_y))
+$(foreach module, $(MODULES_y), $(eval $(call MODULE_PROCESS,$(module))))
 
 # filter out main module and prepare libraies
 
-MODULES		:= $(filter-out main, $(MODULES_ALL)) 
+MODULES		:= $(filter-out main, $(MODULES_y)) 
 LIBS		:= $(addprefix -l, $(MODULES))
 
 # build mouldes
@@ -110,7 +113,7 @@ define MODULE_OBJ_RULE.c
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': CC $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.cpp
@@ -118,7 +121,7 @@ define MODULE_OBJ_RULE.cpp
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': CPP $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.s
@@ -126,12 +129,12 @@ define MODULE_OBJ_RULE.s
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': AS $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -c $$< -o $$@ $(ASMFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(ASMFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_RULE
 
-$(foreach module_obj, $(SRCS_$(1)), $(call MODULE_OBJ_RULE$(suffix $(module_obj)),$(1),$(module_obj)))
+$(foreach module_obj, $(SRCS_$(1)_y), $(call MODULE_OBJ_RULE$(suffix $(module_obj)),$(1),$(module_obj)))
 
 ifeq ($(1), main)
 main: $(OBJS_$(1))
@@ -146,17 +149,12 @@ endef
 
 # apply rules for all module to generate library
 
-$(foreach module, $(MODULES_ALL), $(eval $(call MODULE_RULE,$(module))))
+$(foreach module, $(MODULES_y), $(eval $(call MODULE_RULE,$(module))))
 
 # include depends files
 
 ifneq ($(strip $(DEPS)),)
-DEPS_EXISTED = $(foreach dep, $(DEPS), $(wildcard $(obj)))
-
-ifneq ($(strip $(DEPS_EXISTED)),)
-include $(DEPS_EXISTED)
-endif
-
+-include $(DEPS)
 endif
 
 # build command 
@@ -165,6 +163,7 @@ config: $(MODULE_CFGS)
 	$(Q)mkdir -p $(OUTPUT)/config
 	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
 	$(Q)python3 $(KCONFIG_PATH)/menuconfig.py
+	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
 
 all: $(MODULES) main
 	@echo Generated $(OUTPUT)/main

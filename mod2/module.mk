@@ -14,5 +14,7 @@
 
 # Module makefile
 
-MODULES_ALL	+= mod2
-SRCS_mod2	= $(wildcard $(SRC_TREE)/mod2/*.c)
+MODULES_$(CONFIG_MODULE2) += mod2
+
+SRCS_mod2_$(CONFIG_MODULE2)	= $(wildcard $(SRC_TREE)/mod2/*.c)
+CFLAGS_mod2 				= -DCFLAGS_mod2

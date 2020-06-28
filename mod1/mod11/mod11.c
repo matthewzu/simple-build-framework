@@ -1,6 +1,7 @@
+#include <config.h>
 #include <stdio.h>
 
 void mod11_rtn()
 {
-    printf("\nmodule 11 entered!\n");
+    printf("%s!\n", CONFIG_MODULE11_INFO);
 }

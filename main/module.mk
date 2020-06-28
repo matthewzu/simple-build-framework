@@ -14,5 +14,5 @@
 
 # Main Module makefile
 
-MODULES_ALL	+= main
-SRCS_main	= $(wildcard $(SRC_TREE)/main/*.c)
+MODULES_y	+= main
+SRCS_main_y	= $(wildcard $(SRC_TREE)/main/*.c)
