@@ -17,7 +17,7 @@
 # check build options and command an prepare 
 
 ifneq ($(MAKECMDGOALS),)
-	ifeq ($(filter $(MAKECMDGOALS), config all clean help),)
+	ifeq ($(filter $(MAKECMDGOALS), config all clean help prehdr),)
 		$(error Unsupported commands, try "make help" for more details)	
 	endif
 endif
@@ -81,7 +81,8 @@ default: all
 # process modules
 
 MODULE_MKS	= $(shell find $(SRC_TREE) -name module.mk)
-MODULES_y = #
+MODULE_HDRS = #
+MODULES_y 	= #
 
 # rules
 
@@ -121,6 +122,8 @@ LIBS		:= $(addprefix -l, $(MODULES))
 # rules
 
 define MODULE_HDR_RULE
+
+MODULE_HDRS += $(patsubst $(HDRDIR_$(1)_y)/%, $(OUTPUT)/include/%,$(2))
 
 $(patsubst $(HDRDIR_$(1)_y)/%, $(OUTPUT)/include/%,$(2)): $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': CP $(basename $(notdir $(2))).h)
@@ -182,11 +185,14 @@ endif
 
 # build command 
 
+prehdr: $(MODULE_HDRS)
+
 config: $(MODULE_CFGS)
 	$(Q)mkdir -p $(OUTPUT)/config
 	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
 	$(Q)python3 $(KCONFIG_PATH)/menuconfig.py
 	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
+	make -C $(SRC_TREE) prehdr
 
 all: $(MODULES) main
 	@echo Generated $(OUTPUT)/main

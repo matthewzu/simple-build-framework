@@ -23,7 +23,7 @@ With this framework, you could:
 
 1. create your own modules refers to main/mod1/mod2;
 2. add your source code to modules and add them and compiler flags for them to module.mk;
-3. type **make OUT='project path' KCONFIG='Kconfiglib path' config** in root directory to create and configurate one project;
+3. type **make OUT='project path' KCONFIG='Kconfiglib path' config** in root directory to create/configurate one project and copy head files;
 4. typpe **make OUT='project path'**/**make OUT='project path' clean** to build/clean the entire software and obtain the executable file **<project path>/main**.
 
 **NOTE**:
@@ -31,5 +31,4 @@ you could use type **make help** to obtain the usage for all make commands.
 
 ## TODO
 
-1. support for header files;
-2. more configuration options(compiler, name of executable file, and so on).
+1. more configuration options(compiler, name of executable file, and so on).
