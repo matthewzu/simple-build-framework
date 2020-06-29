@@ -1,5 +1,6 @@
 #include <config.h>
 #include <stdio.h>
+#include <mod12.h>
 
 void mod12_rtn()
 {
