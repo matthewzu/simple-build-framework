@@ -13,6 +13,10 @@
 #   include <mod2.h>
 #endif /* CONFIG_MODULE2 */
 
+#ifndef MAIN
+#   error '-DMAIN' is not yet in force, check 'module.mk' please
+#endif
+
 void main()
 {
     printf("\n%s!\n", CONFIG_MAIN_INFO);
