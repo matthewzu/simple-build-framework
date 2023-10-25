@@ -38,11 +38,9 @@ endif # MAKECMDGOALS != help
 
 export KCONFIG_CONFIG=$(OUTPUT)/config/config.mk
 
-ifeq ("$(origin V)", "command line")
+ifneq ($(V), )
 	VREBOSE_BUILD = $(V)
-endif
-
-ifndef VREBOSE_BUILD
+else
 	VREBOSE_BUILD = 0
 endif
 
