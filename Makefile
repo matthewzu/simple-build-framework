@@ -80,9 +80,9 @@ default: all
 
 # process modules
 
-MODULE_MKS	= $(shell find $(SRC_TREE) -name module.mk)
-MODULE_HDRS = #
-MODULES_y 	= #
+MODULE_MKS			= $(shell find $(SRC_TREE) -name module.mk)
+MODULES_y 			= #
+MODULES_HDRDIR_y	= #
 
 # rules
 
@@ -96,7 +96,7 @@ define MODULE_OBJS_PROCESS
 
 OBJS_$(1) += $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o
 DEPS += $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).d
-
+MODULES_HDRDIR_y += $(HDRDIR_$(1)_y)
 endef
 
 define MODULE_PROCESS
@@ -113,7 +113,10 @@ APPS_y := $(sort $(APPS_y))
 MODULES_y := $(sort $(MODULES_y)) $(APPS_y)
 $(foreach module, $(MODULES_y), $(eval $(call MODULE_PROCESS,$(module))))
 
-# filter out main module and prepare libraies
+MODULES_HDRDIR_y += $(OUTPUT)/config
+INCS := $(addprefix -I, $(MODULES_HDRDIR_y))
+
+# filter out application module and prepare libraies
 
 MODULES		:= $(filter-out $(APPS_y), $(MODULES_y))
 LIBS		:= $(addprefix -l, $(MODULES))
@@ -122,23 +125,12 @@ LIBS		:= $(addprefix -l, $(MODULES))
 
 # rules
 
-define MODULE_HDR_RULE
-
-MODULE_HDRS += $(patsubst $(HDRDIR_$(1)_y)/%, $(OUTPUT)/include/%,$(2))
-
-$(patsubst $(HDRDIR_$(1)_y)/%, $(OUTPUT)/include/%,$(2)): $(2)
-	$(Q)$(if $(QUIET), echo '<$(1)>': CP $(basename $(notdir $(2))).h)
-	$(Q)mkdir -p$(VERBOSE) $(dir $(patsubst $(HDRDIR_$(1)_y)/%, $(OUTPUT)/include/%,$(2)))
-	$(Q)cp -fu$(VERBOSE) $(2) $(patsubst $(HDRDIR_$(1)_y)/%, $(OUTPUT)/include/%,$(2))
-
-endef
-
 define MODULE_OBJ_RULE.c
 
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': CC $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -I$(OUTPUT)/config -I$(OUTPUT)/include -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD $(INCS) -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.cpp
@@ -146,7 +138,7 @@ define MODULE_OBJ_RULE.cpp
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': CPP $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CPPFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD $(INCS) -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CPPFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.s
@@ -154,12 +146,10 @@ define MODULE_OBJ_RULE.s
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': AS $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(ASMFLAGS_$(1)) $(ASMFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD -$(INCS) -c $$< -o $$@ $(ASMFLAGS_$(1)) $(ASMFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_RULE
-
-$(foreach module_hdr, $(HDRS_$(1)_y), $(call MODULE_HDR_RULE,$(1),$(module_hdr)))
 
 $(foreach module_obj, $(SRCS_$(1)_y), $(call MODULE_OBJ_RULE$(suffix $(module_obj)),$(1),$(module_obj)))
 
@@ -168,7 +158,7 @@ $(1): $(OBJS_$(1))
 	$(Q)$(if $(QUIET), echo '<main>': LK $(1))
 	$(Q)gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS)
 else
-$(1): $(patsubst $(HDRDIR_$(1)_y)/%,$(OUTPUT)/include/%,$(HDRS_$(1)_y)) $(OBJS_$(1))
+$(1): $(OBJS_$(1))
 	$(Q)$(if $(QUIET), echo '<$$@>': AR lib$$@.a)
 	$(Q)ar crs$(VERBOSE) $(OUTPUT)/lib$$@.a $$^
 endif
@@ -186,14 +176,10 @@ endif
 
 # build command
 
-prehdr: $(MODULE_HDRS)
-
 config: $(MODULE_CFGS)
 	$(Q)mkdir -p $(OUTPUT)/config
-	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
 	$(Q)python3 $(KCONFIG_PATH)/menuconfig.py
 	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
-	make -C $(SRC_TREE) prehdr
 
 all: $(MODULES) $(APPS_y)
 	@echo Generated $(APPS_y) to $(OUTPUT)/

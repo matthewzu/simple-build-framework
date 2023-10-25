@@ -26,7 +26,7 @@ Simple build framework has the following features:
     * Compiler flags;
 
 7. Kconfig scripts starts at Kconfig in the root directory, and could be modify as you need;
-8. The header files in the public header directories of the enabled modules will be copied to `include` directory of the output directory and keep their own structures, and will be added to the compile flags for all the source files, so the module pathes could be ignored while including the public header files.
+8. The public header path of the enabled modules will be added to the compile flags for all the source files, so the module pathes could be ignored.
 
 ## Module Makefile Segment
 
@@ -44,11 +44,8 @@ APPS_<$(CONFIG_XXX)>    += <moulde name>
 # source files, could be one or more
 SRCS_<moulde name>_<$(CONFIG_XXX)>	    = $(SRC_TREE)/<moulde path>/xxx.x
 
-# base directory for header files, one must and only
+# header file directories, could one or more
 HDRDIR_<moulde name>_<$(CONFIG_XXX)>	= $(SRC_TREE)/<moulde path>/xxx
-
-# header files, could be one or more
-HDRS_<moulde name>_<$(CONFIG_XXX)>	    = HDRDIR_<moulde name>_<$(CONFIG_XXX)>/xxx/xxx.x
 
 # Compiler flags for moudle
 CFLAGS_<moulde name> 			        = xxx
@@ -90,5 +87,6 @@ ASMFLAGS_<moulde name>_<source file name>   = xxx
 
 ## TODO
 
-1. compiler;
-2. Add `Ninja + Python` corresponding to `Makefile`.
+1. add options for cross-compiler and son on;
+2. Use Python to generate Makeifle;
+3. Add `Ninja + Python` corresponding to `Makefile`.

@@ -18,7 +18,5 @@ MODULES_$(CONFIG_MODULE2) += mod2
 
 SRCS_mod2_$(CONFIG_MODULE2)			= $(wildcard $(SRC_TREE)/mod2/*.c)
 HDRDIR_mod2_$(CONFIG_MODULE2)		= $(SRC_TREE)/mod2/h
-HDRS_mod2_$(CONFIG_MODULE2)			= $(SRC_TREE)/mod2/h/mod2.h
-HDRS_mod2_$(CONFIG_MODULE2_DEBUG)	+= $(SRC_TREE)/mod2/h/mod2_dbg.h
 
 CFLAGS_mod2 						= -DMOD2
