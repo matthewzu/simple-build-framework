@@ -16,8 +16,8 @@
 
 APPS_y	+= main main2
 
-SRCS_main_y		= $(wildcard $(SRC_TREE)/main/*.c)
+SRCS_main_y		= $(wildcard $(SRC_TREE)/main/main.c)
 CFLAGS_main 	= -DMAIN
 
-SRCS_main2_y	= $(wildcard $(SRC_TREE)/main/*.c)
-CFLAGS_main2 	= -DMAIN
+SRCS_main2_y	= $(wildcard $(SRC_TREE)/main/main2.c)
+CFLAGS_main2 	= -DMAIN2

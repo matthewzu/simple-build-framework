@@ -9,10 +9,6 @@
 #   include <mod12.h>
 #endif /* CONFIG_MODULE12 */
 
-#ifdef CONFIG_MODULE2
-#   include <mod2.h>
-#endif /* CONFIG_MODULE2 */
-
 #ifndef MAIN
 #   error '-DMAIN' is not yet in force, check 'module.mk' please
 #endif
@@ -28,8 +24,4 @@ void main()
 #ifdef CONFIG_MODULE12
     mod12_rtn();
 #endif /* CONFIG_MODULE12 */
-
-#ifdef CONFIG_MODULE2
-    mod2_rtn();
-#endif /* CONFIG_MODULE2 */
 }
