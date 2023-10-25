@@ -1,4 +1,4 @@
-#Copyright 2016 Xiaofeng Zu
+#Copyright 2016, 2023 Xiaofeng Zu
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
 
 # Main makefile
 
-# check build options and command an prepare 
+# check build options and command an prepare
 
 ifneq ($(MAKECMDGOALS),)
 	ifeq ($(filter $(MAKECMDGOALS), config all clean help prehdr),)
-		$(error Unsupported commands, try "make help" for more details)	
+		$(error Unsupported commands, try "make help" for more details)
 	endif
 endif
 
@@ -55,21 +55,21 @@ endif # MAKECMDGOALS == config
 export KCONFIG_CONFIG=$(OUTPUT)/config/config.mk
 
 ifeq ("$(origin V)", "command line")
-  VREBOSE_BUILD = $(V)
+	VREBOSE_BUILD = $(V)
 endif
 
 ifndef VREBOSE_BUILD
-  VREBOSE_BUILD = 0
+	VREBOSE_BUILD = 0
 endif
 
 ifeq ($(VREBOSE_BUILD),1)
-  QUIET =
-  Q =
-  VERBOSE = v
+	QUIET =
+	Q =
+	VERBOSE = v
 else
-  QUIET=quiet
-  Q = @
-  VERBOSE =
+	QUIET=quiet
+	Q = @
+	VERBOSE =
 endif
 
 default: all
@@ -109,12 +109,13 @@ $(foreach module_mk, $(MODULE_MKS), $(eval $(call MODULE_MK_PROCESS,$(module_mk)
 
 # re-sort modules and remove repeated modules
 
-MODULES_y := $(sort $(MODULES_y))
+APPS_y := $(sort $(APPS_y))
+MODULES_y := $(sort $(MODULES_y)) $(APPS_y)
 $(foreach module, $(MODULES_y), $(eval $(call MODULE_PROCESS,$(module))))
 
 # filter out main module and prepare libraies
 
-MODULES		:= $(filter-out main, $(MODULES_y)) 
+MODULES		:= $(filter-out $(APPS_y), $(MODULES_y))
 LIBS		:= $(addprefix -l, $(MODULES))
 
 # build mouldes
@@ -162,16 +163,16 @@ $(foreach module_hdr, $(HDRS_$(1)_y), $(call MODULE_HDR_RULE,$(1),$(module_hdr))
 
 $(foreach module_obj, $(SRCS_$(1)_y), $(call MODULE_OBJ_RULE$(suffix $(module_obj)),$(1),$(module_obj)))
 
-ifeq ($(1), main)
-main: $(OBJS_$(1))
-	$(Q)$(if $(QUIET), echo '<main>': LK main)
-	$(Q)gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS) 
+ifneq ($(findstring $(1), $(APPS_y)),)
+$(1): $(OBJS_$(1))
+	$(Q)$(if $(QUIET), echo '<main>': LK $(1))
+	$(Q)gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS)
 else
 $(1): $(patsubst $(HDRDIR_$(1)_y)/%,$(OUTPUT)/include/%,$(HDRS_$(1)_y)) $(OBJS_$(1))
 	$(Q)$(if $(QUIET), echo '<$$@>': AR lib$$@.a)
 	$(Q)ar crs$(VERBOSE) $(OUTPUT)/lib$$@.a $$^
 endif
-endef 
+endef
 
 # apply rules for all module to generate library
 
@@ -183,7 +184,7 @@ ifneq ($(strip $(DEPS)),)
 -include $(DEPS)
 endif
 
-# build command 
+# build command
 
 prehdr: $(MODULE_HDRS)
 
@@ -194,10 +195,10 @@ config: $(MODULE_CFGS)
 	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
 	make -C $(SRC_TREE) prehdr
 
-all: $(MODULES) main
-	@echo Generated $(OUTPUT)/main
+all: $(MODULES) $(APPS_y)
+	@echo Generated $(APPS_y) to $(OUTPUT)/
 
-clean: 
+clean:
 	@rm -rf $(OUTPUT)/*
 
 help:

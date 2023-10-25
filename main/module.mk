@@ -1,4 +1,4 @@
-#Copyright 2016 Xiaofeng Zu
+#Copyright 2016, 2023 Xiaofeng Zu
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
 
 # Main Module makefile
 
-MODULES_y	+= main
+APPS_y	+= main main2
 
 SRCS_main_y		= $(wildcard $(SRC_TREE)/main/*.c)
 CFLAGS_main 	= -DMAIN
+
+SRCS_main2_y	= $(wildcard $(SRC_TREE)/main/*.c)
+CFLAGS_main2 	= -DMAIN
