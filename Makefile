@@ -38,6 +38,12 @@ endif # MAKECMDGOALS != help
 
 export KCONFIG_CONFIG=$(OUTPUT)/config/config.mk
 
+ifneq ($(CROSS_COMPILE), )
+	COMPILE_PREFIX = $(CROSS_COMPILE)
+else
+	COMPILE_PREFIX = #
+endif
+
 ifneq ($(V), )
 	VREBOSE_BUILD = $(V)
 else
@@ -112,7 +118,7 @@ define MODULE_OBJ_RULE.c
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': CC $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD $(INCS) -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)$(COMPILE_PREFIX)gcc -MD $(INCS) -c $$< -o $$@ $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.cpp
@@ -120,7 +126,7 @@ define MODULE_OBJ_RULE.cpp
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': CPP $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD $(INCS) -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CPPFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)$(COMPILE_PREFIX)cc -MD $(INCS) -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CPPFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.s
@@ -128,7 +134,7 @@ define MODULE_OBJ_RULE.s
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': AS $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -$(INCS) -c $$< -o $$@ $(ASMFLAGS_$(1)) $(ASMFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)$(COMPILE_PREFIX)gcc -MD -$(INCS) -c $$< -o $$@ $(ASMFLAGS_$(1)) $(ASMFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_RULE
@@ -138,11 +144,11 @@ $(foreach module_obj, $(SRCS_$(1)_y), $(call MODULE_OBJ_RULE$(suffix $(module_ob
 ifneq ($(findstring $(1), $(APPS_y)),)
 $(1): $(OBJS_$(1))
 	$(Q)$(if $(QUIET), echo '<main>': LK $(1))
-	$(Q)gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS)
+	$(Q)$(COMPILE_PREFIX)gcc -o $(OUTPUT)/$$@ $$^ -L$(OUTPUT) $(LIBS)
 else
 $(1): $(OBJS_$(1))
 	$(Q)$(if $(QUIET), echo '<$$@>': AR lib$$@.a)
-	$(Q)ar crs$(VERBOSE) $(OUTPUT)/lib$$@.a $$^
+	$(Q)$(COMPILE_PREFIX)ar crs$(VERBOSE) $(OUTPUT)/lib$$@.a $$^
 endif
 endef
 
