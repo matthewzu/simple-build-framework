@@ -36,22 +36,6 @@ endif
 
 endif # MAKECMDGOALS != help
 
-ifeq ($(MAKECMDGOALS), config)
-
-ifeq ($(KCONFIG), )
-KCONFIG_PATH 	:= $(SRC_TREE)/../Kconfiglib
-$(warning default Kconfiglib directory ($(KCONFIG_PATH)) is used!)
-else
-KCONFIG			:= $(subst \,/,$(KCONFIG))
-KCONFIG_PATH    := $(KCONFIG)
-endif
-
-ifeq ($(wildcard $(KCONFIG_PATH)/genconfig.py),)
-$(error '$(KCONFIG_PATH)' is invalid path for Kconfiglib, obtain it refer to README.md)
-endif
-
-endif # MAKECMDGOALS == config
-
 export KCONFIG_CONFIG=$(OUTPUT)/config/config.mk
 
 ifeq ("$(origin V)", "command line")
@@ -178,8 +162,8 @@ endif
 
 config: $(MODULE_CFGS)
 	$(Q)mkdir -p $(OUTPUT)/config
-	$(Q)python3 $(KCONFIG_PATH)/menuconfig.py
-	$(Q)python3 $(KCONFIG_PATH)/genconfig.py --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
+	$(Q)menuconfig
+	$(Q)genconfig --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
 
 all: $(MODULES) $(APPS_y)
 	@echo Generated $(APPS_y) to $(OUTPUT)/

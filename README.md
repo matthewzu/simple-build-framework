@@ -69,14 +69,20 @@ ASMFLAGS_<moulde name>_<source file name>   = xxx
 ## How to use
 
 1. Intstall Make and Python3;
-2. Clone [github.com/ulfalizer/Kconfiglib](https://github.com/ulfalizer/Kconfiglib);
-3. Configurate project:
+2. Install Kconfiglib:
 
     ```bash
-    simple-build-framework$ make OUT=<project path> KCONFIG=<Kconfiglib path>
+    simple-build-framework$ pip3 install kconfiglib
     ```
 
-4. Build project:
+3. Kconfiglib path may be need to be added to 'PATH' environment variable; for Linux, execute `export PATH=$PATH:~/.local/bin` in the shell or add this command to `~/.bashrc` or `~/.bash_profile`;
+4. Configurate project:
+
+    ```bash
+    simple-build-framework$ make OUT=<project path>
+    ```
+
+5. Build project:
 
     ```bash
     simple-build-framework$ make OUT=<project path>
