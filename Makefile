@@ -146,7 +146,7 @@ define MODULE_OBJ_RULE.cpp
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': CPP $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(CPPFLAGS_$(1)) $(CPPFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_OBJ_RULE.s
@@ -154,7 +154,7 @@ define MODULE_OBJ_RULE.s
 $(OUTPUT)/objs_$(1)/$(basename $(notdir $(2))).o : $(2)
 	$(Q)$(if $(QUIET), echo '<$(1)>': AS $(basename $(notdir $(2))).o)
 	$(Q)mkdir -p $(OUTPUT)/objs_$(1)
-	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(ASMFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(notdir $(2))))
+	$(Q)gcc -MD -I$(OUTPUT)/config -c $$< -o $$@ $(ASMFLAGS_$(1)) $(ASMFLAGS_$(1)_$(basename $(notdir $(2))))
 endef
 
 define MODULE_RULE
