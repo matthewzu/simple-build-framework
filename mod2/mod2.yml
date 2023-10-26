@@ -1,0 +1,24 @@
+#Copyright 2016, 2023 Xiaofeng Zu
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+# moudle2 configuartion
+
+mod2:
+  type:     lib
+  desc:     moudle2 library
+  opt:      CONFIG_MODULE2
+  src:      (SRC_TREE)/mod2/*.c
+  hdrdirs:  (SRC_TREE)/mod2/h
+  cflags:
+    - all:  -DMOD2

@@ -1,0 +1,10 @@
+
+#
+# Main Module
+#
+CONFIG_MAIN_INFO="Hello, Main Module"
+# end of Main Module
+
+CONFIG_MODULE1=y
+CONFIG_MODULE11=y
+# CONFIG_MODULE2 is not set

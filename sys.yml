@@ -1,0 +1,73 @@
+#Copyright 2016, 2023 Xiaofeng Zu
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+# zmake system configuartion, will be involved by default,
+# but MUST NOT be modified.
+
+# variables
+
+# system variables, used and updated by zmake, must exist
+
+SRC_TREE:
+  type:     var   # entity type:
+                  #   app     - application
+                  #   lib     - library
+                  #   var     - variable, used to save build arguments or intermediate variables
+                  #   target  - target, target for build command(make/ninja)
+  desc: path for source code, zmake internal value # optional, only for display
+  # val:    xxx   # value, optional for system variables
+
+PRJ_DIR:
+  type: var
+
+COMPILER_PREFIX:
+  type: var
+
+VREBOSE_BUILD:
+  type: var
+
+# system variables, must exist
+
+KCONFIG_CONFIG:
+  type: var
+  val:  $(PRJ_DIR)/configs/config.mk
+
+# targets
+
+# system targets, used and updated by zmake, must exist
+
+help:
+  type: target
+  # desc: xxx     # optional, only for display
+  # cmd:  xxx     # optional, commands need be executed in shell
+  # depneds: xxx  # optional, target dependent modules
+
+info:
+  type: target
+
+config:
+  type: target
+  desc: confoguration project
+
+all:  # default target
+  type: target
+  desc: building all targets
+
+clean:
+  type: target
+  desc: cleaning all compiled files
+
+clean:
+  type: target
+  desc: cleaning all compiled/generated files

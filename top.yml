@@ -1,0 +1,88 @@
+#Copyright 2016, 2023 Xiaofeng Zu
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+# zmake top configuartion
+
+# includes, note that file contents MUST NOT be overlapped,
+# otherwise the latter will overwrite the former.
+
+includes:
+  - sys.yml               # system yaml, MUST be included
+  - main/main.yml         # application main/mani2 yaml
+  - mod1/mod11/mod11.yml  # library mod11 yaml
+  - mod1/mod12/mod12.yml  # library mod12 yaml
+  - mod2/mod2.yml         # library mod2 yaml
+
+# entities defines for the following types:
+#   1)'var':    variables that is used to save build arguments or intermediate variables,
+#   could be be referenced by '$(variable name)';
+#   2)'target': target for build command(make/ninja...);
+#   3)'app':    applications that could be executed;
+#   4)'lib':    libraries that could be linked to applications.
+
+# system entities are defined in sys.yml, and MUST NOT be modified.
+
+# customer variables
+#
+# example:
+#
+#   variable name:  # must be unique for all entities
+#     type: var
+#     desc: xxx # optional, description that is only for display
+#     val:  xxx # value, that could be string , or reference to other variable
+
+# customer targets
+#
+# example:
+#
+# target name:      # must be unique for all entities
+#   type: target
+#   desc: xxx # optional, description that is only for display
+#   cmd:  xxx # optional, commands that need be executed in shell
+#   deps: xxx # optional, modules depended
+
+# applications
+#
+# example:
+#
+# application name:         # must be unique for all entities
+#   type:       app
+#   desc:       xxx         # optional, description that is only for display
+#   opt:        CONFIG_XXX  # optional, Kconfig option that decides whether application is enabled:
+#                           #   if present, it must be a Kconfig option that will be 'y' or 'n';
+#                           #   if absent, application will be will be forced to enable.
+#   src:        xxx         # source files or directories, support regular expression
+#   cflags:                 # optional, additional compiler flags for C files
+#     - all:    xxx         # compiler flags for all C files
+#     - xxx.c:  xxx         # compiler flags for xxx.c
+#   cppflags:   xxx         # optional, additional compiler flags for cpp files
+#   asmflags:   xxx         # optional, additional compiler flags for assembly files
+
+# libraries
+#
+# example:
+#
+# library name:             # must be unique for all entities
+#   type:       lib
+#   desc:       xxx         # optional, description that is only for display
+#   opt:        CONFIG_XXX  # optional, Kconfig option that decides whether library is enabled:
+#                           #   if present, it must be a Kconfig option that will be 'y' or 'n';
+#                           #   if absent, library will be will be forced to enable.
+#   src:        xxx         # source files or directories, support regular expression
+#   hdrdirs:    xxx         # optional, public header file directories
+#   cflags:                 # optional, additional compiler flags for C files
+#     - all:    xxx         # compiler flags for all C files
+#     - xxx.c:  xxx         # compiler flags for xxx.c
+#   cppflags:   xxx         # optional, additional compiler flags for cpp files
+#   asmflags:   xxx         # optional, additional compiler flags for assembly files
