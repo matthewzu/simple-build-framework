@@ -18,8 +18,10 @@ mod11:
   type:         lib
   desc:         moudle11 library
   opt:          CONFIG_MODULE11
-  src:          (SRC_TREE)/mod1/mod11/*.c
-  hdrdirs:      (SRC_TREE)/mod1/mod11/include/mod11
+  src:
+    - $(SRC_PATH)/mod1/mod11
+  hdrdirs:
+    - $(SRC_PATH)/mod1/mod11/include/mod11
   cflags:
-    - all:      -DMOD11
-    - mod11.c:  -DMOD11_MOD11
+    all:      -DMOD11
+    mod11.c:  -DMOD11_MOD11

@@ -17,14 +17,16 @@
 main:
   type:     app
   desc:     main application
-  src:      $(SRC_TREE)/main/main.c 
+  src:
+    - $(SRC_PATH)/main/main.c
   cflags:
     - all:  -DMAIN
 
 main2:
   type:      app
   desc:     main2 application
-  src:      $(SRC_TREE)/main/main2.c
+  src:
+    - $(SRC_PATH)/main/main2.c
   cflags:
-    - all:  -DMAIN2
+    all:  -DMAIN2
 

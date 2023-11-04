@@ -18,7 +18,9 @@ mod2:
   type:     lib
   desc:     moudle2 library
   opt:      CONFIG_MODULE2
-  src:      (SRC_TREE)/mod2/*.c
-  hdrdirs:  (SRC_TREE)/mod2/h
+  src:      
+    - $(SRC_PATH)/mod2
+  hdrdirs:  
+    - $(SRC_PATH)/mod2/h
   cflags:
-    - all:  -DMOD2
+    all:  -DMOD2

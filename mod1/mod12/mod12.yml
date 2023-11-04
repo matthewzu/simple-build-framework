@@ -18,7 +18,9 @@ mod12:
   type:     lib
   desc:     moudle12 library
   opt:      CONFIG_MODULE12
-  src:      (SRC_TREE)/mod1/mod12/*.c
-  hdrdirs:  SRC_TREE)/mod1/mod12
+  src:
+    - $(SRC_PATH)/mod1/mod12
+  hdrdirs:
+    - $(SRC_PATH)/mod1/mod12
   cflags:
-    - all:  -DMOD12
+    all:  -DMOD12

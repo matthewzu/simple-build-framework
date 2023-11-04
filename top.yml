@@ -18,7 +18,6 @@
 # otherwise the latter will overwrite the former.
 
 includes:
-  - sys.yml               # system yaml, MUST be included
   - main/main.yml         # application main/mani2 yaml
   - mod1/mod11/mod11.yml  # library mod11 yaml
   - mod1/mod12/mod12.yml  # library mod12 yaml
@@ -31,7 +30,9 @@ includes:
 #   3)'app':    applications that could be executed;
 #   4)'lib':    libraries that could be linked to applications.
 
-# system entities are defined in sys.yml, and MUST NOT be modified.
+# system variables
+#   1)SRC_PATH: path for source code
+#   2)PRJ_PATH: path for project
 
 # customer variables
 #
@@ -40,34 +41,8 @@ includes:
 #   variable name:  # must be unique for all entities
 #     type: var
 #     desc: xxx # optional, description that is only for display
-#     val:  xxx # value, that could be string , or reference to other variable
-
-# customer targets
-#
-# example:
-#
-# target name:      # must be unique for all entities
-#   type: target
-#   desc: xxx # optional, description that is only for display
-#   cmd:  xxx # optional, commands that need be executed in shell
-#   deps: xxx # optional, modules depended
-
-# applications
-#
-# example:
-#
-# application name:         # must be unique for all entities
-#   type:       app
-#   desc:       xxx         # optional, description that is only for display
-#   opt:        CONFIG_XXX  # optional, Kconfig option that decides whether application is enabled:
-#                           #   if present, it must be a Kconfig option that will be 'y' or 'n';
-#                           #   if absent, application will be will be forced to enable.
-#   src:        xxx         # source files or directories, support regular expression
-#   cflags:                 # optional, additional compiler flags for C files
-#     - all:    xxx         # compiler flags for all C files
-#     - xxx.c:  xxx         # compiler flags for xxx.c
-#   cppflags:   xxx         # optional, additional compiler flags for cpp files
-#   asmflags:   xxx         # optional, additional compiler flags for assembly files
+#     val:  xxx # string that could include references to other variable'
+                # that have beed defined, such as '$(var_name)', or any value
 
 # libraries
 #
@@ -79,10 +54,64 @@ includes:
 #   opt:        CONFIG_XXX  # optional, Kconfig option that decides whether library is enabled:
 #                           #   if present, it must be a Kconfig option that will be 'y' or 'n';
 #                           #   if absent, library will be will be forced to enable.
-#   src:        xxx         # source files or directories, support regular expression
-#   hdrdirs:    xxx         # optional, public header file directories
+#   src:                    # list, source files or directories:
+#     - $(ZMake variable name)/xxx/xxx.c
+#     - $(ZMake variable name)/xxx  # for directory, all source files in it will be involved
+#   hdrdirs:                # optional, list, public header file directories
+#     - $(ZMake variable name)/xxx
 #   cflags:                 # optional, additional compiler flags for C files
-#     - all:    xxx         # compiler flags for all C files
-#     - xxx.c:  xxx         # compiler flags for xxx.c
-#   cppflags:   xxx         # optional, additional compiler flags for cpp files
+#     all:      xxx         # compiler flags for all C files
+#     xxx.c:    xxx         # compiler flags for xxx.c
+#   cppflags:               # optional, additional compiler flags for cpp files
+#     all:      xxx         # compiler flags for all CPP files
+#     xxx.cpp:  xxx         # compiler flags for xxx.cpp
 #   asmflags:   xxx         # optional, additional compiler flags for assembly files
+#     all:      xxx         # compiler flags for all assembly files
+#     xxx.s:    xxx         # compiler flags for xxx.s
+#     xxx.S:    xxx         # compiler flags for xxx.S
+
+# applications
+#
+# example:
+#
+# application name:         # must be unique for all entities
+#   type:       app
+#   desc:       xxx         # optional, description that is only for display
+#   opt:        CONFIG_XXX  # optional, Kconfig option that decides whether application is enabled:
+#                           #   if present, it must be a Kconfig option that will be 'y' or 'n';
+#                           #   if absent, application will be will be forced to enable.
+#   src:                    # list, source files or directories:
+#     - $(ZMake variable name)/xxx/xxx.c
+#     - $(ZMake variable name)/xxx  # for directory, all source files in it will be involved
+#   cflags:                 # optional, additional compiler flags for C files
+#     all:      xxx         # compiler flags for all C files
+#     xxx.c:    xxx         # compiler flags for xxx.c
+#   cppflags:               # optional, additional compiler flags for cpp files
+#     all:      xxx         # compiler flags for all CPP files
+#     xxx.cpp:  xxx         # compiler flags for xxx.cpp
+#   asmflags:   xxx         # optional, additional compiler flags for assembly files
+#     all:      xxx         # compiler flags for all assembly files
+#     xxx.s:    xxx         # compiler flags for xxx.s
+#     xxx.S:    xxx         # compiler flags for xxx.S
+
+# system targets
+#
+#   1)help:       display help information for other targets
+#   2)config:     confogure project
+#   3)all:        building all applications/libraries, default target
+#   4)clean:      clean all compiled files
+#   5)distclean:  clean all generated files
+#   6)info:       dispaly project information
+
+# customer targets
+#
+# example:
+#
+# target name:      # must be unique for all entities
+#   type: target
+#   desc: xxx # optional, description that is only for display
+#   cmd:  xxx # optional, commands that need be executed with description:
+#     desc:   command
+#   deps: xxx # optional, modules depended:
+#     - libXXX
+#     - appXXX
