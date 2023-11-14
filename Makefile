@@ -164,7 +164,9 @@ endif
 
 # build command
 
-config: $(MODULE_CFGS)
+.PHONY: config
+
+config:
 	$(Q)mkdir -p $(OUTPUT)/config
 	$(Q)menuconfig
 	$(Q)genconfig --header-path=$(OUTPUT)/config/config.h --config-out=$(KCONFIG_CONFIG)
