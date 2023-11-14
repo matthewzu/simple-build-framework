@@ -346,9 +346,13 @@ class _zmake_module(zmake_entity):
         """
         generate makefile segments for all objects of this module and write fo file
         """
+        
+        deps = ""
         for key, obj in self.src.items():
+            deps += " " + obj._dep_name
             obj.make_gen(fd, libname, added_flags)
 
+        fd.write("-include %s\n\n" %deps)
         fd.flush()
 
     def ninja_gen(self, fd, libname, added_flags):
@@ -752,6 +756,8 @@ def zmake_sys_target_create():
     logging.info("create zmake system targets")
 
     config_cmd = "python3 $(SRC_PATH)/zmake.py -m $(SRC_PATH) $(PRJ_PATH)"
+    if _PRJ_GEN == _PRJ_GEN_TYPE_NINJA:
+        config_cmd += " -g ninja"
     if _PRJ_VREB == 1:
         config_cmd += " -V"
     zmake_target("config",
