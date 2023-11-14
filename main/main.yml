@@ -1,4 +1,4 @@
-#Copyright 2016, 2023 Xiaofeng Zu
+#Copyright 2023 Xiaofeng Zu
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -15,18 +15,23 @@
 # applications configuartion
 
 main:
-  type:     app
-  desc:     main application
+  type:   app
+  desc:   main application
   src:
     - $(SRC_PATH)/main/main.c
   cflags:
     - all:  -DMAIN
+  libs:
+    - mod11
+    - mod12
 
 main2:
-  type:      app
-  desc:     main2 application
+  type:   app
+  desc:   main2 application
   src:
     - $(SRC_PATH)/main/main2.c
   cflags:
     all:  -DMAIN2
+  libs:
+    - mod2
 

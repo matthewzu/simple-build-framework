@@ -1,4 +1,4 @@
-#Copyright 2016, 2023 Xiaofeng Zu
+#Copyright 2023 Xiaofeng Zu
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ mod2:
   type:     lib
   desc:     moudle2 library
   opt:      CONFIG_MODULE2
-  src:      
+  src:
     - $(SRC_PATH)/mod2
-  hdrdirs:  
+  hdrdirs:
     - $(SRC_PATH)/mod2/h
   cflags:
-    all:  -DMOD2
+    all:  -DMOD2 -I$(SRC_PATH)/mod2/h

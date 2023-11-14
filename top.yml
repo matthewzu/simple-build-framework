@@ -1,4 +1,4 @@
-#Copyright 2016, 2023 Xiaofeng Zu
+#Copyright 2023 Xiaofeng Zu
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 # otherwise the latter will overwrite the former.
 
 includes:
-  - main/main.yml         # application main/mani2 yaml
   - mod1/mod11/mod11.yml  # library mod11 yaml
   - mod1/mod12/mod12.yml  # library mod12 yaml
   - mod2/mod2.yml         # library mod2 yaml
+  - main/main.yml         # application main/mani2 yaml
 
 # entities defines for the following types:
 #   1)'var':    variables that is used to save build arguments or intermediate variables,
@@ -41,8 +41,23 @@ includes:
 #   variable name:  # must be unique for all entities
 #     type: var
 #     desc: xxx # optional, description that is only for display
-#     val:  xxx # string that could include references to other variable'
+#     val:  xxx # string that could include references to other variables
                 # that have beed defined, such as '$(var_name)', or any value
+
+CC:
+  type: var
+  desc: compiler for objects
+  val:  gcc -MD
+
+AR:
+  type: var
+  desc: archiver for libraries
+  val:  ar
+
+LD:
+  type: var
+  desc: linker for applications
+  val:  gcc
 
 # libraries
 #
@@ -93,15 +108,17 @@ includes:
 #     all:      xxx         # compiler flags for all assembly files
 #     xxx.s:    xxx         # compiler flags for xxx.s
 #     xxx.S:    xxx         # compiler flags for xxx.S
+#   linkflags:  xxx         # optional, additional linker flags
+#   libs:       xxx         # optional, list, libraries depended:
+#     - xxx
 
 # system targets
 #
-#   1)help:       display help information for other targets
-#   2)config:     confogure project
-#   3)all:        building all applications/libraries, default target
-#   4)clean:      clean all compiled files
-#   5)distclean:  clean all generated files
-#   6)info:       dispaly project information
+#   1)config:     confogure project
+#   2)all:        building all applications/libraries, default target
+#   3)clean:      clean all compiled files
+#
+#   To enable verbose output, add "V=1" option for make or add "-v" for ninja.
 
 # customer targets
 #
@@ -113,5 +130,6 @@ includes:
 #   cmd:  xxx # optional, commands that need be executed with description:
 #     desc:   command
 #   deps: xxx # optional, modules depended:
-#     - libXXX
-#     - appXXX
+#     - xxx
+#
+# Note that 'cmd' and 'deps' MUST NOT be absent at the same time.

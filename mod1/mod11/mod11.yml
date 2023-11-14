@@ -1,4 +1,4 @@
-#Copyright 2016, 2023 Xiaofeng Zu
+#Copyright 2023 Xiaofeng Zu
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ mod11:
   src:
     - $(SRC_PATH)/mod1/mod11
   hdrdirs:
-    - $(SRC_PATH)/mod1/mod11/include/mod11
+    - $(SRC_PATH)/mod1/mod11/include
   cflags:
     all:      -DMOD11
-    mod11.c:  -DMOD11_MOD11
+    mod11.c:  -DMOD11_MOD11 -I$(SRC_PATH)/mod1/mod11/include
